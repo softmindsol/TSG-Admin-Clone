@@ -4,12 +4,18 @@ import NotificationsDropdown from "../../components/Common/NotificationsDropdown
 import PATH from "../../routes/path";
 import { BiMenu } from "react-icons/bi";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../store/features/auth/slice";
+import { useNavigate } from "react-router-dom";
 
 const DashboardHeader = ({ isMinimized, onMobileMenuClick }) => {
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { admin } = useSelector((state) => state.auth);
 
   const handleSearchChange = (e) => setSearchValue(e.target.value);
 
@@ -23,9 +29,14 @@ const DashboardHeader = ({ isMinimized, onMobileMenuClick }) => {
     setShowNotifications(false);
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate(PATH.login);
+  };
+
   const headerConfig = {
     [PATH.dashboard]: {
-      title: "Hello, George! 👋",
+      title: `Hello, ${admin?.name || "Admin User"}! 👋`,
       subtitle: "Wednesday, August 13, 2025",
     },
     [PATH.agents]: {
@@ -201,10 +212,10 @@ const DashboardHeader = ({ isMinimized, onMobileMenuClick }) => {
                   />
                   <div>
                     <div className="font-poppins text-xs md:text-sm font-medium text-dark">
-                      John Smith
+                      {admin?.name || "Admin User"}
                     </div>
                     <div className="font-poppins text-xs text-gray">
-                      john.smith@company.com
+                      {admin?.email || "admin@example.com"}
                     </div>
                   </div>
                 </div>
@@ -219,7 +230,10 @@ const DashboardHeader = ({ isMinimized, onMobileMenuClick }) => {
                     Help & Support
                   </button>
                   <hr className="my-2 border-[#E2E8F0]" />
-                  <button className="w-full text-left px-3 py-2 text-xs md:text-sm text-[#EF4444] hover:bg-red-50 rounded-md transition-colors">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2 text-xs md:text-sm text-[#EF4444] hover:bg-red-50 rounded-md transition-colors"
+                  >
                     Sign Out
                   </button>
                 </div>

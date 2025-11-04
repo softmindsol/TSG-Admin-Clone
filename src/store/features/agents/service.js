@@ -6,10 +6,10 @@ import config from "../../../utils/constants/endpoint";
 // ✅ GET ALL AGENTS
 export const getAllAgent = createAsyncThunk(
   "agents/getAllAgent",
-  async (_, { rejectWithValue }) => {
+  async (status = "all", { rejectWithValue }) => {
     try {
-      const response = await api.get(config.agents.getAllAgent);
-      toast.success("Fetched all agents successfully!");
+      const response = await api.get(`${config.agents.getAllAgents}?status=${status}`);
+      toast.success("Fetched agents successfully!");
       return response.data;
     } catch (error) {
       const message =

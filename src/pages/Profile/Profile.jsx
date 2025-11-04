@@ -1,12 +1,14 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import images from "../../assets/images";
 import Icons from "../../assets/icons/Icons";
 import CustomHeading from "../../components/Common/CustomHeading";
 import { EditIcon, LockIcon } from "../../assets/icons";
 
 const Profile = () => {
+  const { admin } = useSelector((state) => state.auth);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState("John Smith");
+  const [name, setName] = useState(admin?.name || "Admin User");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -17,7 +19,7 @@ const Profile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [email, setEmail] = useState("johnsmith12@gmail.com");
+  const [email, setEmail] = useState(admin?.email || "admin@example.com");
   const [passwordAccordian, setPasswordAccordian] = useState(false);
   return (
     <>
@@ -52,7 +54,10 @@ const Profile = () => {
             />
           </div>
           <div>
-            <CustomHeading heading="John Smith" fontSize="text-[24px]" />
+            <CustomHeading
+              heading={admin?.name || "Admin User"}
+              fontSize="text-[24px]"
+            />
             <p className="text-[#6B7280] text-lg font-normal">Admin</p>
           </div>
         </div>

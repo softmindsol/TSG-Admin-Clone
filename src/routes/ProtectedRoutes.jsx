@@ -1,16 +1,13 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-
-
-
+import PATH from "./path";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("adminToken"); // ✅ use same key as your login
+  const token = localStorage.getItem("token");
 
-//    if (!token || isTokenExpired(token)) {
-//     localStorage.removeItem("adminToken");
-//     return <Navigate to="/" replace />;
-//   }
+  if (!token) {
+    return <Navigate to={PATH.login} replace />;
+  }
 
   return children;
 };

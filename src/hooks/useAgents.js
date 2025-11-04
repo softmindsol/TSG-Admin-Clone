@@ -1,7 +1,7 @@
 import useSWR from "swr";
 // ✅ use your global axios setup
 import config from "../utils/constants/endpoint";
-import axios from "axios";
+import api from "../utils/constants/Api";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
@@ -14,7 +14,7 @@ if (!API_BASE_URL) {
 const fetcher = async (url) => {
   try {
     console.log("📡 Fetching from:", url);
-    const res = await axios.get(url);
+    const res = await api.get(url);
     console.log("✅ Response:", res.data);
     return res.data;
   } catch (err) {
@@ -24,17 +24,16 @@ const fetcher = async (url) => {
 };
 
 export const useAgents = () => {
-  const endpoint = `${API_BASE_URL}/${config.agents.getAllAgent}`;
+  const endpoint = `${config.agents.getAllAgents}?status=all`;
 
   const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher);
 
   // ✅ Delete Agent API (modular, with revalidation)
   const deleteAgent = async (agentId) => {
     try {
-      const deleteUrl = `${API_BASE_URL}/${config.agents.deleteAgent}/${agentId}`;
-      console.log("🗑️ Deleting agent:", deleteUrl);
+      console.log("🗑️ Deleting agent:", agentId);
 
-      await axios.delete(deleteUrl);
+      await api.delete(`${config.agents.deleteAgent}/${agentId}`);
 
       // ✅ Optimistic revalidation (instantly update UI)
       mutate(

@@ -12,6 +12,7 @@ import Requests from "../pages/Requests/Requests";
 import Payments from "../pages/Payments/Payments";
 import Reminders from "../pages/Reminders/Reminders";
 import Profile from "../pages/Profile/Profile";
+import Login from "../pages/Login/Login";
 
 const Loader = () => (
   <div className="flex items-center justify-center h-screen">Loading...</div>
@@ -20,7 +21,11 @@ const Loader = () => (
 const Routes = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to={PATH.dashboard} replace />, // ✅ Redirect root to /dashboard
+    element: <Navigate to={PATH.login} replace />, // Redirect root to /login
+  },
+  {
+    path: PATH.login,
+    element: <Login />,
   },
   {
     path: PATH.dashboard,

@@ -4,21 +4,23 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import React, { useEffect, useRef } from "react";
 import { UpArrowFilter } from "../../assets/icons";
 
-const SearchAndFilterComponent = () => {
+const SearchAndFilterComponent = ({
+  searchQuery = "",
+  onSearchChange = () => {},
+  statusFilter = "all",
+  onStatusChange = () => {},
+  statusOptions = [],
+}) => {
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  const [selectedFilters, setSelectedFilters] = React.useState(["By default"]);
   const filterRef = useRef(null);
 
   const toggleFilter = () => {
     setIsFilterOpen((prev) => !prev);
   };
 
-  const handleFilterChange = (filter) => {
-    setSelectedFilters((prevFilters) =>
-      prevFilters.includes(filter)
-        ? prevFilters.filter((item) => item !== filter)
-        : [...prevFilters, filter]
-    );
+  const handleFilterChange = (filterValue) => {
+    onStatusChange(filterValue);
+    setIsFilterOpen(false);
   };
 
   // ✅ Close filter when clicking outside
@@ -49,6 +51,8 @@ const SearchAndFilterComponent = () => {
         <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search by name or client code..."
           className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg max-lg:w-full w-[640px] h-[41px] focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -83,21 +87,21 @@ const SearchAndFilterComponent = () => {
             />
           </button>
           {isFilterOpen && (
-            <div className="absolute top-full right-0 mt-2 w-[223px] bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute top-full right-0 mt-2 w-[223px] bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               <ul className="py-2">
-                {filters.map((filter) => (
+                {statusOptions.map((option) => (
                   <li
-                    key={filter}
+                    key={option.value}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                    onClick={() => handleFilterChange(filter)}
+                    onClick={() => handleFilterChange(option.value)}
                   >
                     <input
-                      type="checkbox"
-                      checked={selectedFilters.includes(filter)}
+                      type="radio"
+                      checked={statusFilter === option.value}
                       readOnly
                       className="mr-3 h-4 w-4 rounded border-gray-300 text-indigo-600 accent-dark"
                     />
-                    <span>{filter}</span>
+                    <span>{option.label}</span>
                   </li>
                 ))}
               </ul>

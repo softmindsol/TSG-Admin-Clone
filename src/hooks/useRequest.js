@@ -27,7 +27,7 @@ export const useRequests = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR(`${API_BASE_URL}/${config.request.getAllRequest}`, fetcher, {
+  } = useSWR(`${config.request.getAllRequest}?status=pending`, fetcher, {
     revalidateOnFocus: false,
   });
 

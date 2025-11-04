@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import Icons from "../../assets/icons/Icons";
 import { IoCloseCircle } from "react-icons/io5";
 import CustomHeading from "../Common/CustomHeading";
@@ -13,8 +14,8 @@ const SendRemainderModal = ({ isOpen, onClose }) => {
   const [selected, setSelected] = useState([]);
 
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0  flex justify-center items-center z-50 p-4 font-poppins">
+  return createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[99999] p-4 font-poppins">
       <div className="absolute inset-0 h-screen bg-black opacity-80"></div>
       {/* Modal Panel */}
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
@@ -160,7 +161,8 @@ const SendRemainderModal = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

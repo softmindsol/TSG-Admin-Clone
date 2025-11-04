@@ -1,10 +1,13 @@
 const config = {
+  auth: {
+    login: "admin/login",
+  },
   agents: {
-    getAllAgent: "admin/get-all-agents",
+    getAllAgents: "admin/agents",
     deleteAgent: "admin/delete-agent",
   },
   request: {
-    getAllRequest: "admin/agent-requests",
+    getAllRequest: "admin/agents",
     approveAgentRequest: "admin/approve-agent",
     rejectAgentRequest: "admin/reject-agent",
   },

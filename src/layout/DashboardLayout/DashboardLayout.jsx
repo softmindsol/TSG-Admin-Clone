@@ -28,7 +28,7 @@ const DashboardLayout = () => {
 
         {/* Mobile Drawer Sidebar */}
         <div
-          className={`fixed inset-0 z-[100] bg-black/40 md:hidden transition-opacity duration-300 ${
+          className={`fixed inset-0 z-[9000] bg-black/40 md:hidden transition-opacity duration-300 ${
             isMobileOpen ? "opacity-100 visible" : "opacity-0 invisible"
           }`}
           onClick={toggleMobileSidebar}

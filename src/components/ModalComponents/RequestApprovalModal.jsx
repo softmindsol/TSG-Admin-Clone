@@ -1,5 +1,6 @@
 import Icons from "../../assets/icons/Icons";
 import { IoClose } from "react-icons/io5";
+import { createPortal } from "react-dom";
 import GlobalButton from "../Common/GlobalButton";
 import { useDispatch } from "react-redux";
 
@@ -56,9 +57,15 @@ const RequestApprovalModal = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 p-4 font-poppins bg-black bg-opacity-50">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+  const modalContent = (
+    <div
+      className="fixed inset-0 flex justify-center items-center z-[99999] p-4 font-poppins bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-[99999]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* HEADER */}
         <div className="flex justify-between items-start p-6 border-b border-gray-200">
           <div className="flex items-center gap-4">
@@ -254,6 +261,8 @@ const RequestApprovalModal = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default RequestApprovalModal;

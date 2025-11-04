@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { IoClose, IoCloseCircle } from "react-icons/io5";
 
 import { LuUser, LuUser2 } from "react-icons/lu";
@@ -8,16 +9,40 @@ import GlobalButton from "../Common/GlobalButton";
 import FileUpload from "../Common/FileUpload";
 
 const AddNewAgent = ({ isOpen, onClose }) => {
-  const [category, setCategory] = useState("");
+  const [formData, setFormData] = useState({
+    agentName: "",
+    agentCode: "",
+    email: "",
+    website: "",
+    phone: "",
+    agentType: "",
+    companyName: "",
+    location: "",
+  });
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    console.log("Form Data:", formData);
+    // Add API call here to create new agent
+    onClose();
+  };
 
   if (!isOpen) return null;
 
-  return (
-    // Modal Overlay
-    <div className="fixed inset-0  flex justify-center items-center z-50 p-4 font-poppins">
-      <div className="absolute inset-0 h-screen bg-black opacity-80"></div>
+  const modalContent = (
+    // Modal Overlay - Render as portal to body
+    <div
+      className="fixed inset-0 flex justify-center items-center z-[99999] p-4 font-poppins bg-black bg-opacity-50"
+      onClick={onClose}
+    >
       {/* Modal Panel */}
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
+      <div
+        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative z-[99999]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="flex items-start pb-6 border-b border-gray-200">
           <div className="bg-blue-100 p-3 rounded-lg mr-4">
@@ -47,24 +72,42 @@ const AddNewAgent = ({ isOpen, onClose }) => {
               Agent Overview
             </h3>
             <div className="grid grid-cols-1 mb-4 md:grid-cols-2 gap-x-8 gap-y-6">
-              <FormInput label="Agent Name" id="agentName" value="Enter Name" />
-              <FormInput label="Agent Code" id="agentCode" value="CLT-48XYZ1" />
+              <FormInput
+                label="Agent Name"
+                id="agentName"
+                value={formData.agentName}
+                onChange={(e) => handleInputChange("agentName", e.target.value)}
+                placeholder="Enter Name"
+              />
+              <FormInput
+                label="Agent Code"
+                id="agentCode"
+                value={formData.agentCode}
+                onChange={(e) => handleInputChange("agentCode", e.target.value)}
+                placeholder="CLT-48XYZ1"
+              />
               <FormInput
                 label="Agent Email Address"
                 id="email"
                 type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Enter Email"
               />
               <FormInput
                 label="Agent Website Link"
-                id="email"
-                type="email"
+                id="website"
+                type="url"
+                value={formData.website}
+                onChange={(e) => handleInputChange("website", e.target.value)}
                 placeholder="Enter Link"
               />
               <FormInput
                 type="phone"
                 label="Phone Number"
                 id="phone"
+                value={formData.phone}
+                onChange={(value) => handleInputChange("phone", value)}
                 placeholder="+44 7346 876 773"
               />
               <SelectInput
@@ -193,13 +236,19 @@ const AddNewAgent = ({ isOpen, onClose }) => {
           <GlobalButton variant="secondary" onClick={onClose} className="px-8">
             Cancel
           </GlobalButton>
-          <GlobalButton variant="primary" className="px-10">
-            Add Agent{" "}
+          <GlobalButton
+            variant="primary"
+            onClick={handleSubmit}
+            className="px-10"
+          >
+            Add Agent
           </GlobalButton>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default AddNewAgent;

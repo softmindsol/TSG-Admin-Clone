@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import images from "../../assets/images";
 import Icons from "../../assets/icons/Icons";
 import PATH from "../../routes/path";
@@ -12,6 +13,7 @@ const DashboardSidebar = ({
 }) => {
   const location = useLocation();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { admin } = useSelector((state) => state.auth);
 
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
@@ -69,7 +71,7 @@ const DashboardSidebar = ({
 
   return (
     <div
-      className={`bg-white rounded-[10px] shadow-[0px_10px_60px_rgba(8,23,34,0.12)] flex flex-col transition-all duration-300 z-50
+      className={`bg-white rounded-[10px] shadow-[0px_10px_60px_rgba(8,23,34,0.12)] flex flex-col transition-all duration-300 z-[100]
         ${
           isMobile
             ? "w-[260px] h-full"
@@ -188,17 +190,17 @@ const DashboardSidebar = ({
             {!isMinimized && (
               <div>
                 <div className="font-poppins text-xs md:text-sm font-medium text-[#081722]">
-                  John Smith
+                  {admin?.name || "Admin User"}
                 </div>
                 <div className="font-poppins text-xs text-[#6B7280]">
-                  Sales Manager
+                  Administrator
                 </div>
               </div>
             )}
 
             {/* Profile Dropdown */}
             {showProfileMenu && (
-              <div className="absolute bottom-20 mt-2 w-64 bg-white border border-[#E2E8F0] rounded-lg shadow-[0px_10px_60px_rgba(8,23,34,0.12)] z-50">
+              <div className="absolute bottom-20 mt-2 w-64 bg-white border border-[#E2E8F0] rounded-lg shadow-[0px_10px_60px_rgba(8,23,34,0.12)] z-[200]">
                 <div className="p-4">
                   <div className="flex items-center space-x-3 mb-4">
                     <img
@@ -208,10 +210,10 @@ const DashboardSidebar = ({
                     />
                     <div>
                       <div className="font-poppins text-xs md:text-sm font-medium text-dark">
-                        John Smith
+                        {admin?.name || "Admin User"}
                       </div>
                       <div className="font-poppins text-xs text-gray">
-                        john.smith@company.com
+                        {admin?.email || "admin@example.com"}
                       </div>
                     </div>
                   </div>

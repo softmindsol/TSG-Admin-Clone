@@ -16,6 +16,8 @@ const Agents = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const tableColumns = [
     {
@@ -85,8 +87,27 @@ const Agents = () => {
     },
   ];
 
+  // Filter and search logic
+  const filteredAgents =
+    agents?.filter((agent) => {
+      const matchesSearch =
+        `${agent.firstName || ""} ${agent.lastName || ""}`
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        agent.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        agent.phoneNumber?.includes(searchQuery) ||
+        agent.operatingArea?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && agent.status === "approved") ||
+        (statusFilter === "inactive" && agent.status !== "approved");
+
+      return matchesSearch && matchesStatus;
+    }) || [];
+
   const tableData =
-    agents?.map((agent) => ({
+    filteredAgents?.map((agent) => ({
       agent: {
         name: `${agent.firstName || ""} ${agent.lastName || ""}`,
         email: agent.email || "-",
@@ -133,7 +154,17 @@ const Agents = () => {
           />
 
           <div className="mt-3 md:mt-7">
-            <SearchAndFilterComponent />
+            <SearchAndFilterComponent
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              statusOptions={[
+                { value: "all", label: "All Status" },
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+              ]}
+            />
 
             <div className="mt-3 md:mt-6">
               <ErrorBoundary fallback={ErrorFallback}>

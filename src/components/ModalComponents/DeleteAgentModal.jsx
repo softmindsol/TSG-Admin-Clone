@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import Icons from "../../assets/icons/Icons";
 import { IoCloseCircle } from "react-icons/io5";
 import CustomHeading from "../Common/CustomHeading";
@@ -10,17 +11,25 @@ import { useNavigate } from "react-router-dom";
 const DeleteAgentModal = ({ isOpen, onClose, agentId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   if (!isOpen) return null;
+
   const handleDeleteAgent = () => {
     dispatch(deleteAgent(agentId));
     onClose();
     navigate("/dashboard/agents");
   };
-  return (
-    <div className="fixed inset-0  flex justify-center items-center z-50 p-4 font-poppins">
-      <div className="absolute inset-0 h-screen bg-black opacity-80"></div>
+
+  const modalContent = (
+    <div
+      className="fixed inset-0 flex justify-center items-center z-[99999] p-4 font-poppins bg-black bg-opacity-50"
+      onClick={onClose}
+    >
       {/* Modal Panel */}
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 relative">
+      <div
+        className="bg-white rounded-2xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 relative z-[99999]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-start mb-5 pb-6 border-b border-gray-200">
           <div className="bg-[#F50408]/10 p-3 rounded-lg mr-4">
             <Icons.UserIcon className="w-6 h-6 text-[#F50408]" />
@@ -63,6 +72,8 @@ const DeleteAgentModal = ({ isOpen, onClose, agentId }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default DeleteAgentModal;
