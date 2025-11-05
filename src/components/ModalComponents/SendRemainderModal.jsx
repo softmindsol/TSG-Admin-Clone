@@ -18,7 +18,7 @@ const SendRemainderModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[99999] p-4 font-poppins">
       <div className="absolute inset-0 h-screen bg-black opacity-80"></div>
       {/* Modal Panel */}
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide p-8 relative">
         <div className="flex items-start mb-5 pb-6 border-b border-gray-200">
           <div className="bg-[#00AC4F]/10 p-3 rounded-lg mr-4">
             <Icons.SendIcon className="w-6 h-6 text-primaryGreen" />

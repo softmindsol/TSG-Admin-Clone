@@ -1,39 +1,33 @@
 import React, { useState } from "react";
+import { useAgentNotes } from "../../hooks/useAgents";
 import CustomHeading from "../Common/CustomHeading";
 import AddNewNoteModal from "../ModalComponents/AddNewNoteModal";
 
-const Notes = () => {
+const Notes = ({ agentId }) => {
+  const { notes, isLoading, isError, addNote } = useAgentNotes(agentId);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const announcements = [
-    {
-      title: "Top performer in Q4 2023 - exceeded targets by 150%",
-      time: "By Support Team   05/01/2024",
-      borderColor: "#1877F2",
-      bgColor: "#F2F9FF",
-    },
-    {
-      title: "Requested additional marketing materials for luxury listings",
-      time: "By Support Team   05/01/2024",
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-GB");
+  };
 
-      borderColor: "#10B981",
-      bgColor: "#ECFDF5",
-    },
-    {
-      title: "Client feedback consistently excellent - 4.9/5 average rating",
-      time: "By Support Team   05/01/2024",
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        Loading notes...
+      </div>
+    );
+  }
 
-      borderColor: "#F59E0B",
-      bgColor: "#FFFBEB",
-    },
-    {
-      title: "Client feedback consistently excellent - 4.9/5 average rating",
-      time: "By Support Team   05/01/2024",
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        Error loading notes
+      </div>
+    );
+  }
 
-      borderColor: "#F50408",
-      bgColor: "#FFF1F1",
-    },
-  ];
   return (
     <>
       <div className="bg-white p-6 rounded-lg border">
@@ -48,25 +42,31 @@ const Notes = () => {
           <AddNewNoteModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
+            onAddNote={addNote}
           />
         </div>
-        {announcements?.map((item, index) => (
-          <div
-            key={index}
-            className="rounded-lg p-4 mb-4 border-l-4"
-            style={{
-              borderColor: item.borderColor,
-              backgroundColor: item.bgColor,
-            }}
-          >
-            <p className="text-[#081722] font-normal text-base font-poppins">
-              {item?.title}
-            </p>
-            <p className="text-[#6B7280] font-normal font-poppins text-xs">
-              {item?.time}
-            </p>
-          </div>
-        ))}
+        {notes?.length > 0 ? (
+          notes.map((note, index) => (
+            <div
+              key={note._id || index}
+              className="rounded-lg p-4 mb-4 border-l-4"
+              style={{
+                borderColor: note.urgent ? "#F50408" : "#1877F2",
+                backgroundColor: note.urgent ? "#FFF1F1" : "#F2F9FF",
+              }}
+            >
+              <p className="text-[#081722] font-normal text-base font-poppins">
+                {note.content}
+              </p>
+              <p className="text-[#6B7280] font-normal font-poppins text-xs">
+                By Admin • {formatDate(note.createdAt)}
+                {note.urgent && " • Urgent"}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-center py-8">No notes available</p>
+        )}
       </div>
     </>
   );

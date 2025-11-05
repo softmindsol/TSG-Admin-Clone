@@ -63,7 +63,7 @@ const RequestApprovalModal = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-[99999]"
+        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide relative z-[99999]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* HEADER */}

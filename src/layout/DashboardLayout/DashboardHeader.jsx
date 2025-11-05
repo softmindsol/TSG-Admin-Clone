@@ -34,10 +34,21 @@ const DashboardHeader = ({ isMinimized, onMobileMenuClick }) => {
     navigate(PATH.login);
   };
 
+  const getCurrentDate = () => {
+    const today = new Date();
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return today.toLocaleDateString('en-US', options);
+  };
+
   const headerConfig = {
     [PATH.dashboard]: {
       title: `Hello, ${admin?.name || "Admin User"}! 👋`,
-      subtitle: "Wednesday, August 13, 2025",
+      subtitle: getCurrentDate(),
     },
     [PATH.agents]: {
       title: "Agent Management",

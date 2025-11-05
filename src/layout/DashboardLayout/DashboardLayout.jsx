@@ -57,7 +57,7 @@ const DashboardLayout = () => {
             onMobileMenuClick={toggleMobileSidebar}
           />
 
-          <main className="transition-all duration-300 relative z-0 overflow-x-auto">
+          <main className="transition-all duration-300 relative z-0 overflow-x-auto mb-6">
             <Outlet />
           </main>
         </div>

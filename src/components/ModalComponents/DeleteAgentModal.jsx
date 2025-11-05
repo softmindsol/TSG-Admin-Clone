@@ -27,7 +27,7 @@ const DeleteAgentModal = ({ isOpen, onClose, agentId }) => {
     >
       {/* Modal Panel */}
       <div
-        className="bg-white rounded-2xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 relative z-[99999]"
+        className="bg-white rounded-2xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto scrollbar-hide p-8 relative z-[99999]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start mb-5 pb-6 border-b border-gray-200">

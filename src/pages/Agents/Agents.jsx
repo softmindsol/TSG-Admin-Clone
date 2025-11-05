@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAgents } from "../../hooks/useAgents";
 import Icons from "../../assets/icons/Icons";
 import StatusBadge from "../../components/Common/StatusBadge";
 import { CircleLock } from "../../assets/icons";
 import AddNewAgent from "../../components/ModalComponents/AddNewAgent";
-import AgentDetail from "./AgentDetail";
 import SearchAndFilterComponent from "../../components/Common/SearchAndFilterComponent";
 import SkeletonTable from "../../components/Common/SkeletonTable";
 import ErrorBoundary from "../../utils/error-boundary/ErrorBoundary";
@@ -13,9 +13,9 @@ import ErrorFallback from "../../utils/error-boundary/ErrorFallaback";
 const Agents = () => {
   const { agents, isLoading, isError, refreshAgents } = useAgents();
   console.log("🚀 ~ Agents ~ agents:", agents);
+  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -59,7 +59,7 @@ const Agents = () => {
       label: "Next Payment",
       render: (date) => (
         <div className="flex items-center text-xs md:text-sm text-gray-500">
-          <Icons.CameraIcons className="mr-2" />
+          <Icons.CalendarIcon className="mr-2" />
           {date}
         </div>
       ),
@@ -76,7 +76,7 @@ const Agents = () => {
         <div className="flex items-center gap-4">
           <Icons.EyeIcon
             className="cursor-pointer"
-            onClick={() => setSelectedAgent(row.fullAgent)}
+            onClick={() => navigate(`/dashboard/agents/${row.fullAgent._id}`)}
             size={19}
           />
           <Icons.Envelope size={19} />
@@ -132,81 +132,84 @@ const Agents = () => {
 
   return (
     <>
-      {selectedAgent ? (
-        <AgentDetail
-          agent={selectedAgent}
-          onBack={() => setSelectedAgent(null)}
+      <div className="flex justify-end my-1 md:my-8">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-6 py-2 bg-primary text-white font-semibold text-xs sm:text-sm md:text-base rounded-md hover:bg-gray-700 font-poppins"
+        >
+          + Add New Agent
+        </button>
+      </div>
+
+      <AddNewAgent
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAgentCreated={refreshAgents}
+      />
+
+      <div className="mt-3 md:mt-7">
+        <SearchAndFilterComponent
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          statusOptions={[
+            { value: "all", label: "All Status" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
         />
-      ) : (
-        <>
-          <div className="flex justify-end my-1 md:my-8">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-6 py-2 bg-primary text-white font-semibold text-xs sm:text-sm md:text-base rounded-md hover:bg-gray-700 font-poppins"
-            >
-              + Add New Agent
-            </button>
-          </div>
 
-          <AddNewAgent
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
+        <div className="mt-3 md:mt-6">
+          <ErrorBoundary fallback={ErrorFallback}>
+            <div className="overflow-x-auto bg-white rounded-lg shadow">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {tableColumns.map((col) => (
+                      <th
+                        key={col.key}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {col.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
 
-          <div className="mt-3 md:mt-7">
-            <SearchAndFilterComponent
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              statusFilter={statusFilter}
-              onStatusChange={setStatusFilter}
-              statusOptions={[
-                { value: "all", label: "All Status" },
-                { value: "active", label: "Active" },
-                { value: "inactive", label: "Inactive" },
-              ]}
-            />
-
-            <div className="mt-3 md:mt-6">
-              <ErrorBoundary fallback={ErrorFallback}>
-                <div className="overflow-x-auto bg-white rounded-lg shadow">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
+                {isLoading ? (
+                  <SkeletonTable rows={6} columns={tableColumns.length} />
+                ) : tableData.length === 0 ? (
+                  <tbody>
+                    <tr>
+                      <td
+                        colSpan={tableColumns.length}
+                        className="px-6 py-12 text-center text-gray-500 text-sm"
+                      >
+                        No data found
+                      </td>
+                    </tr>
+                  </tbody>
+                ) : (
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {tableData.map((row, i) => (
+                      <tr key={i}>
                         {tableColumns.map((col) => (
-                          <th
-                            key={col.key}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            {col.label}
-                          </th>
+                          <td key={col.key} className="px-6 py-4">
+                            {col.render
+                              ? col.render(row[col.key], row)
+                              : row[col.key]}
+                          </td>
                         ))}
                       </tr>
-                    </thead>
-
-                    {isLoading ? (
-                      <SkeletonTable rows={6} columns={tableColumns.length} />
-                    ) : (
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {tableData.map((row, i) => (
-                          <tr key={i}>
-                            {tableColumns.map((col) => (
-                              <td key={col.key} className="px-6 py-4">
-                                {col.render
-                                  ? col.render(row[col.key], row)
-                                  : row[col.key]}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    )}
-                  </table>
-                </div>
-              </ErrorBoundary>
+                    ))}
+                  </tbody>
+                )}
+              </table>
             </div>
-          </div>
-        </>
-      )}
+          </ErrorBoundary>
+        </div>
+      </div>
     </>
   );
 };

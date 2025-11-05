@@ -1,18 +1,18 @@
 import React from "react";
 
-const SkeletonTable = ({ rows = 6 }) => {
+const SkeletonTable = ({ rows = 6, columns = 1 }) => {
   return (
-    <div className="w-full">
-      <div className="animate-pulse space-y-2">
-        {/* header skeleton */}
-        <div className="h-10 bg-gray-200 rounded-md mb-3"></div>
-
-        {/* rows skeleton */}
-        {[...Array(rows)].map((_, index) => (
-          <div key={index} className="h-12 bg-gray-100 rounded-md"></div>
-        ))}
-      </div>
-    </div>
+    <tbody className="bg-white divide-y divide-gray-200">
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <tr key={rowIndex} className="animate-pulse">
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <td key={colIndex} className="px-6 py-4">
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
   );
 };
 

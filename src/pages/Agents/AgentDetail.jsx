@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAgent } from "../../hooks/useAgents";
 import Icons from "../../assets/icons/Icons";
 import CustomHeading from "../../components/Common/CustomHeading";
 import StatusBadge from "../../components/Common/StatusBadge";
@@ -9,7 +11,10 @@ import Overview from "../../components/AgentDetailsTabs/Overview";
 import Documents from "../../components/AgentDetailsTabs/Documents";
 import DeleteAgentModal from "../../components/ModalComponents/DeleteAgentModal";
 
-const AgentDetail = ({ onBack, agent }) => {
+const AgentDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { agent, isLoading, isError } = useAgent(id);
   const agentId = agent?._id;
   console.log("🚀 ~ AgentDetail ~ agentId:", agentId);
   const [activeTab, setActiveTab] = useState("Overview");
@@ -20,13 +25,13 @@ const AgentDetail = ({ onBack, agent }) => {
         return <Overview />;
 
       case "Payments":
-        return <Payments />;
+        return <Payments agentId={agentId} />;
       case "Notes":
-        return <Notes />;
+        return <Notes agentId={agentId} />;
       case "Performance":
         return <Performance />;
       case "Documents":
-        return <Documents />;
+        return <Documents agentId={agentId} />;
       default:
         return null;
     }
@@ -41,11 +46,27 @@ const AgentDetail = ({ onBack, agent }) => {
   ];
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (isError || !agent) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Error loading agent details
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mt-6">
         <div
-          onClick={onBack}
+          onClick={() => navigate("/dashboard/agents")}
           className="flex cursor-pointer items-center text-primary text-xl gap-2"
         >
           <Icons.ArrowBack />
@@ -73,7 +94,8 @@ const AgentDetail = ({ onBack, agent }) => {
       <div className="bg-white border rounded-lg p-4 font-poppins mt-10 grid grid-cols-[0.75fr_9fr_1.25fr] gap-3 flex-wrap">
         <section className="flex  justify-center">
           <div className="flex items-center font-bold text-2xl justify-center bg-[#F3F4F6] rounded-full h-16 w-16 p-5">
-            SW
+            {agent?.firstName?.charAt(0)?.toUpperCase()}
+            {agent?.lastName?.charAt(0)?.toUpperCase()}
           </div>
         </section>
 

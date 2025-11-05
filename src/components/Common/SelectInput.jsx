@@ -9,13 +9,12 @@ const SelectInput = ({
   value,
   onChange,
   className = "",
+  required = false,
 }) => {
-  const [selected, setSelected] = useState("");
   const [otherValue, setOtherValue] = useState("");
 
   const handleSelectChange = (e) => {
     const selectedValue = e.target.value;
-    setSelected(selectedValue);
 
     if (selectedValue !== "other") {
       setOtherValue("");
@@ -45,9 +44,10 @@ const SelectInput = ({
       <div className="relative">
         <select
           id={id}
-          value={selected || ""}
+          value={value || ""}
           onChange={handleSelectChange}
           className="w-full h-11 pl-4 pr-10 border border-gray-300 rounded-md bg-white text-xs md:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+          required={required}
         >
           <option value="" disabled>
             {placeholder}
@@ -66,7 +66,7 @@ const SelectInput = ({
       </div>
 
       {/* Always show input if "Other" is selected */}
-      {selected === "other" && (
+      {value === "other" && (
         <input
           type="text"
           placeholder="Please specify..."

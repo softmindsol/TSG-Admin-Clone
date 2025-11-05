@@ -6,28 +6,83 @@ import { LuUser, LuUser2 } from "react-icons/lu";
 import FormInput from "../Common/FormInput";
 import SelectInput from "../Common/SelectInput";
 import GlobalButton from "../Common/GlobalButton";
-import FileUpload from "../Common/FileUpload";
+import { useCreateAgent } from "../../hooks/useAgents";
+import { toast } from "sonner";
 
-const AddNewAgent = ({ isOpen, onClose }) => {
+const AddNewAgent = ({ isOpen, onClose, onAgentCreated }) => {
+  const { createAgent } = useCreateAgent();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
-    agentName: "",
-    agentCode: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    website: "",
-    phone: "",
-    agentType: "",
+    phoneNumber: "",
     companyName: "",
-    location: "",
+    operatingArea: "",
+    agentType: "",
+    experience: "",
+    password: "",
+    status: "approved",
   });
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log("Form Data:", formData);
-    // Add API call here to create new agent
-    onClose();
+  const handleSubmit = async () => {
+    // Validate required fields
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phoneNumber",
+      "companyName",
+      "operatingArea",
+      "agentType",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field]?.trim()
+    );
+
+    if (missingFields.length > 0) {
+      toast.error(
+        `Please fill in all required fields: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await createAgent(formData);
+      toast.success("Agent created successfully!");
+
+      // Reset form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        companyName: "",
+        operatingArea: "",
+        agentType: "",
+        experience: "",
+        password: "",
+        status: "approved",
+      });
+
+      onClose();
+
+      // Call callback if provided
+      if (onAgentCreated) {
+        onAgentCreated(response.data.agent);
+      }
+    } catch (error) {
+      console.error("Failed to create agent:", error);
+      toast.error(error.response?.data?.message || "Failed to create agent");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -40,7 +95,7 @@ const AddNewAgent = ({ isOpen, onClose }) => {
     >
       {/* Modal Panel */}
       <div
-        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative z-[99999]"
+        className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide p-8 relative z-[99999]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -66,182 +121,129 @@ const AddNewAgent = ({ isOpen, onClose }) => {
 
         {/* Form Content */}
         <div className="py-6">
-          {/* Client Overview Section */}
+          {/* Agent Overview Section */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-800 mb-5">
-              Agent Overview
+              Agent Information
             </h3>
             <div className="grid grid-cols-1 mb-4 md:grid-cols-2 gap-x-8 gap-y-6">
               <FormInput
-                label="Agent Name"
-                id="agentName"
-                value={formData.agentName}
-                onChange={(e) => handleInputChange("agentName", e.target.value)}
-                placeholder="Enter Name"
+                label="First Name *"
+                id="firstName"
+                value={formData.firstName}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                placeholder="Enter first name"
+                required
               />
               <FormInput
-                label="Agent Code"
-                id="agentCode"
-                value={formData.agentCode}
-                onChange={(e) => handleInputChange("agentCode", e.target.value)}
-                placeholder="CLT-48XYZ1"
+                label="Last Name *"
+                id="lastName"
+                value={formData.lastName}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+                placeholder="Enter last name"
+                required
               />
               <FormInput
-                label="Agent Email Address"
+                label="Email Address *"
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="Enter Email"
+                placeholder="Enter email address"
+                required
               />
               <FormInput
-                label="Agent Website Link"
-                id="website"
-                type="url"
-                value={formData.website}
-                onChange={(e) => handleInputChange("website", e.target.value)}
-                placeholder="Enter Link"
+                label="Phone Number *"
+                id="phoneNumber"
+                type="tel"
+                value={formData.phoneNumber}
+                onChange={(e) =>
+                  handleInputChange("phoneNumber", e.target.value)
+                }
+                placeholder="+1234567890"
+                required
               />
               <FormInput
-                type="phone"
-                label="Phone Number"
-                id="phone"
-                value={formData.phone}
-                onChange={(value) => handleInputChange("phone", value)}
-                placeholder="+44 7346 876 773"
-              />
-              <SelectInput
-                label="Agent Type"
-                id="assignedAgent"
-                placeholder="Select Agent"
-                options={[
-                  { value: "residential_sales", label: "Residential Sales" },
-                  {
-                    value: "residential_lettings",
-                    label: "Residential Lettings",
-                  },
-                  { value: "commercial_sales", label: "Commercial Sales" },
-                  {
-                    value: "commercial_lettings",
-                    label: "Commercial Lettings",
-                  },
-                  { value: "investor", label: "Investor" },
-                ]}
+                label="Company Name *"
+                id="companyName"
+                value={formData.companyName}
+                onChange={(e) =>
+                  handleInputChange("companyName", e.target.value)
+                }
+                placeholder="Enter company name"
+                required
               />
               <FormInput
-                label="Company Name"
-                id="companyname"
-                type="text"
-                placeholder="Enter Company Name"
+                label="Operating Area *"
+                id="operatingArea"
+                value={formData.operatingArea}
+                onChange={(e) =>
+                  handleInputChange("operatingArea", e.target.value)
+                }
+                placeholder="Enter operating area"
+                required
               />
-
               <SelectInput
-                label="Location"
-                id="location"
-                placeholder="Select Type"
+                label="Agent Type *"
+                id="agentType"
+                value={formData.agentType}
+                onChange={(value) => handleInputChange("agentType", value)}
+                placeholder="Select agent type"
                 options={[
-                  { value: "residential_sales", label: "Residential Sales" },
-                  {
-                    value: "residential_lettings",
-                    label: "Residential Lettings",
-                  },
-                  { value: "commercial_sales", label: "Commercial Sales" },
-                  {
-                    value: "commercial_lettings",
-                    label: "Commercial Lettings",
-                  },
-                  { value: "investor", label: "Investor" },
+                  { value: "individual", label: "Individual" },
+                  { value: "agency", label: "Agency" },
                 ]}
+                required
+              />
+              <FormInput
+                label="Experience"
+                id="experience"
+                value={formData.experience}
+                onChange={(e) =>
+                  handleInputChange("experience", e.target.value)
+                }
+                placeholder="e.g. 5 years"
+              />
+              <FormInput
+                label="Password (optional)"
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange("password", e.target.value)}
+                placeholder="Leave empty for auto-generated password"
               />
               <SelectInput
-                label="Subscription Status"
+                label="Status"
                 id="status"
-                placeholder="Select Type"
+                value={formData.status}
+                onChange={(value) => handleInputChange("status", value)}
+                placeholder="Select status"
                 options={[
-                  { value: "residential_sales", label: "Paid" },
-                  {
-                    value: "residential_lettings",
-                    label: "Unpaid",
-                  },
-                  { value: "commercial_sales", label: "Pending" },
+                  { value: "approved", label: "Approved" },
+                  { value: "pending", label: "Pending" },
                 ]}
               />
-              <SelectInput
-                label="Agent Status"
-                id="status"
-                placeholder="Select Type"
-                options={[
-                  { value: "residential_sales", label: "Active" },
-                  {
-                    value: "residential_lettings",
-                    label: "Inactive",
-                  },
-                ]}
-              />
-              <SelectInput
-                label="Subscription Plan"
-                id="status"
-                placeholder="Standard"
-                options={[
-                  { value: "residential_sales", label: "Active" },
-                  {
-                    value: "residential_lettings",
-                    label: "Inactive",
-                  },
-                ]}
-              />
-              <FormInput label="Monthly Rate" id="rate" placeholder="$ 199" />
             </div>
-            <FormInput
-              label="Company Address"
-              id="address"
-              value="Enter Address"
-            />
           </div>
-
-          {/* Notes Section */}
-          <div className="mb-3">
-            <label
-              htmlFor="notes"
-              className="block text-lg font-semibold text-gray-800 mb-3"
-            >
-              Bio & Information
-            </label>
-            <textarea
-              id="notes"
-              rows="4"
-              placeholder="e.g Looking for move-in ready properties with good foot traffic"
-              className="w-full p-4 border border-gray-300 rounded-md text-xs md:text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-          </div>
-          <div className="mb-8">
-            <label
-              htmlFor="notes"
-              className="block text-lg font-semibold text-gray-800 mb-3"
-            >
-              Internal Notes
-            </label>
-            <textarea
-              id="notes"
-              rows="4"
-              placeholder="e.g Looking for move-in ready properties with good foot traffic"
-              className="w-full p-4 border border-gray-300 rounded-md text-xs md:text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-          </div>
-          <FileUpload />
         </div>
 
         {/* Modal Footer */}
         <div className="flex justify-end items-center pt-6 border-t border-gray-200 space-x-4">
-          <GlobalButton variant="secondary" onClick={onClose} className="px-8">
+          <GlobalButton
+            variant="secondary"
+            onClick={onClose}
+            className="px-8"
+            disabled={isSubmitting}
+          >
             Cancel
           </GlobalButton>
           <GlobalButton
             variant="primary"
             onClick={handleSubmit}
             className="px-10"
+            disabled={isSubmitting}
           >
-            Add Agent
+            {isSubmitting ? "Creating..." : "Create Agent"}
           </GlobalButton>
         </div>
       </div>

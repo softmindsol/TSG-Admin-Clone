@@ -8,6 +8,7 @@ import DashboardLayout from "../layout/DashboardLayout/DashboardLayout";
 import PATH from "./path";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Agents from "../pages/Agents/Agents";
+import AgentDetail from "../pages/Agents/AgentDetail";
 import Requests from "../pages/Requests/Requests";
 import Payments from "../pages/Payments/Payments";
 import Reminders from "../pages/Reminders/Reminders";
@@ -39,6 +40,7 @@ const Routes = createBrowserRouter([
     children: [
       { path: "", element: <Dashboard /> },
       { path: PATH.agents, element: <Agents /> },
+      { path: "agents/:id", element: <AgentDetail /> },
       { path: PATH.requests, element: <Requests /> },
       { path: PATH.payments, element: <Payments /> },
       { path: PATH.reminders, element: <Reminders /> },

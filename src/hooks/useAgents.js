@@ -23,6 +23,116 @@ const fetcher = async (url) => {
   }
 };
 
+export const useAgent = (id) => {
+  const endpoint = id ? `${config.agents.getAgentById}/${id}` : null;
+
+  const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher);
+
+  return {
+    agent: data?.data || null,
+    isLoading,
+    isError: !!error,
+    refreshAgent: mutate,
+  };
+};
+
+export const useAgentPaymentInfo = (agentId) => {
+  const endpoint = agentId ? `${config.agents.getAgentPaymentInfo}/${agentId}` : null;
+
+  const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher);
+
+  return {
+    paymentInfo: data?.data || null,
+    isLoading,
+    isError: !!error,
+    refreshPaymentInfo: mutate,
+  };
+};
+
+export const useAgentNotes = (agentId) => {
+  const endpoint = agentId ? `${config.agents.getAgentNotes}/${agentId}/notes` : null;
+
+  const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher);
+
+  const addNote = async (noteData) => {
+    try {
+      await api.patch(`${config.agents.addAgentNote}/${agentId}/note`, noteData);
+      mutate(); // Refresh notes
+    } catch (err) {
+      console.error("Add note failed:", err);
+      throw err;
+    }
+  };
+
+  return {
+    notes: data?.data || [],
+    isLoading,
+    isError: !!error,
+    refreshNotes: mutate,
+    addNote,
+  };
+};
+
+export const useAgentFiles = (agentId) => {
+  const endpoint = agentId ? `${config.files.getFiles}/${agentId}` : null;
+
+  const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher);
+
+  const uploadFile = async (fileData) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', fileData.file);
+      if (fileData.name) formData.append('name', fileData.name);
+
+      const response = await api.post(`${config.files.uploadFile}/${agentId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      mutate(); // Refresh files
+      return response.data;
+    } catch (err) {
+      console.error("Upload failed:", err);
+      throw err;
+    }
+  };
+
+  const deleteFile = async (fileId) => {
+    try {
+      await api.delete(`${config.files.deleteFile}/${agentId}/${fileId}`);
+      mutate(); // Refresh files
+    } catch (err) {
+      console.error("Delete failed:", err);
+      throw err;
+    }
+  };
+
+  return {
+    files: data?.data || [],
+    isLoading,
+    isError: !!error,
+    refreshFiles: mutate,
+    uploadFile,
+    deleteFile,
+  };
+};
+
+export const useCreateAgent = () => {
+  const createAgent = async (agentData) => {
+    try {
+      const response = await api.post(config.agents.createAgent, agentData);
+      return response.data;
+    } catch (err) {
+      console.error("Create agent failed:", err);
+      throw err;
+    }
+  };
+
+  return {
+    createAgent,
+  };
+};
+
 export const useAgents = () => {
   const endpoint = `${config.agents.getAllAgents}?status=all`;
 
